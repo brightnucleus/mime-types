@@ -1,0 +1,24 @@
+{
+  "name": "brightnucleus/mime-types",
+  "description": "Automatically updated MIME types database, using the Apache HTTP Server configuration.",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Alain Schlesser",
+      "email": "alain.schlesser@gmail.com"
+    }
+  ],
+  "type": "composer-plugin",
+  "require": {
+    "php": ">=5.3",
+    "composer-plugin-api": "^1.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "BrightNucleus\\MimeTypes\\": "src/"
+    }
+  },
+  "extra": {
+    "class": "BrightNucleus\\MimeTypes\\MimeTypesPlugin"
+  }
+}
