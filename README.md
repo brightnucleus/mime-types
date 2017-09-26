@@ -43,10 +43,10 @@ Usage is pretty straight-forward. Just use one of the two provided static method
 use BrightNucleus\MimeTypes\MimeTypes;
 
 // Get the extensions for a given MIME type.
-$name = MimeTypes::getExtensionsForType( 'image/jpeg' ); // Returns array( 'jpeg', 'jpg', 'jpe' ).
+$extensions = MimeTypes::getExtensionsForType( 'image/jpeg' ); // Returns array( 'jpeg', 'jpg', 'jpe' ).
 
 // Get the MIME types for a given extension.
-$code = MimeTypes::getTypesForExtension( 'jpg' ); // Returns array( 'image/jpeg' ).
+$mimeTypes = MimeTypes::getTypesForExtension( 'jpg' ); // Returns array( 'image/jpeg' ).
 ```
 
 ## Contributing
