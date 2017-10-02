@@ -21,7 +21,7 @@ use RuntimeException;
  * @package BrightNucleus\MimeTypes
  * @author  Alain Schlesser <alain.schlesser@gmail.com>
  */
-class ConfigGenerator
+final class ConfigGenerator
 {
     /**
      * Source data file to generate the config from.
@@ -62,7 +62,7 @@ class ConfigGenerator
      *
      * @param string $phpFile Path to the PHP file.
      */
-    protected function generate($phpFile)
+    public function generate($phpFile)
     {
         $lines = file($this->txtFile);
         $lines = array_filter($lines, array($this, 'filterComments'));
@@ -94,7 +94,7 @@ class ConfigGenerator
      *
      * @return string PHP code representing the provided array.
      */
-    protected function renderArray($data)
+    private function renderArray($data)
     {
         $elements = array();
 
@@ -120,7 +120,7 @@ class ConfigGenerator
      *
      * @return array MIME-type-based array.
      */
-    protected function getMimeTypes($lines)
+    private function getMimeTypes($lines)
     {
         $result = array();
 
@@ -142,7 +142,7 @@ class ConfigGenerator
      *
      * @return array Extension-based array.
      */
-    protected function getExtensions($lines)
+    private function getExtensions($lines)
     {
         $result = array();
 
@@ -168,7 +168,7 @@ class ConfigGenerator
      *
      * @return bool Whether the line should be kept or not.
      */
-    protected function filterComments($line)
+    private function filterComments($line)
     {
         return 0 !== strpos($line, '#');
     }
@@ -182,7 +182,7 @@ class ConfigGenerator
      *
      * @return array Array of MIME type and extensions parts.
      */
-    protected function splitLines($line)
+    private function splitLines($line)
     {
         $parts = explode("\t", $line);
         return array(array_shift($parts), array_pop($parts));
