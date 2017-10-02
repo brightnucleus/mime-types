@@ -19,7 +19,7 @@ namespace BrightNucleus\MimeTypes;
  * @package BrightNucleus\MimeTypes
  * @author  Alain Schlesser <alain.schlesser@gmail.com>
  */
-class MimeTypes
+final class MimeTypes
 {
 
     const DATA_URL = 'http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types';
@@ -35,7 +35,7 @@ class MimeTypes
      *
      * @since 0.1.0
      */
-    protected static $data;
+    private static $data;
 
     /**
      * Get the location of the database file.
@@ -110,7 +110,7 @@ class MimeTypes
      *
      * @since 0.1.0
      */
-    protected static function getData()
+    private static function getData()
     {
         if (! self::$data) {
             $filepath   = self::getLocation() . '.php';
