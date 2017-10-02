@@ -18,6 +18,7 @@ use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem;
+use Exception;
 
 /**
  * Class CountryPlugin.
@@ -27,7 +28,7 @@ use Composer\Util\Filesystem;
  * @package BrightNucleus\MimeTypes
  * @author  Alain Schlesser <alain.schlesser@gmail.com>
  */
-class MimeTypesPlugin implements PluginInterface, EventSubscriberInterface
+final class MimeTypesPlugin implements PluginInterface, EventSubscriberInterface
 {
 
     /**
@@ -60,21 +61,26 @@ class MimeTypesPlugin implements PluginInterface, EventSubscriberInterface
         $filesystem->ensureDirectoryExists(dirname($dataFilename));
 
         $io = $event->getIO();
-        $io->write('Fetching new source version of the Apache HTTP Server MIME types database...', true);
+        $io->write('Fetching new source version of the Apache HTTP Server MIME types database...');
         self::downloadFile($dataFilename . '.txt', MimeTypes::DATA_URL);
 
-        $io->write('Generating PHP configuration file from MIME types source file...', true);
-        self::generateConfig($dataFilename . '.txt', $dataFilename . '.php');
+        $io->write('Generating PHP configuration file from MIME types source file...');
+        try {
+            $generator = new ConfigGenerator($dataFilename . '.txt');
+            $config    = $generator->generate();
+            self::writeConfigFile($dataFilename . '.php', $config);
+        } catch (Exception $exception) {
+            $io->writeError('Could not write PHP configuration file. Reason: ' . $exception->getMessage());
+        }
 
-        $io->write('Removing MIME types source file...', true);
+        $io->write('Removing MIME types source file...');
         $filesystem->remove($dataFilename . '.txt');
 
         $io->write(
             sprintf(
                 'The MIME types database has been updated (%1$s).',
                 $dataFilename . '.php'
-            ),
-            true
+            )
         );
     }
 
@@ -84,8 +90,9 @@ class MimeTypesPlugin implements PluginInterface, EventSubscriberInterface
      * @since 0.1.0
      *
      * @param string $filename Filename of the file to download.
+     * @param string $url      URL to download the file from.
      */
-    protected static function downloadFile($filename, $url)
+    private static function downloadFile($filename, $url)
     {
         $fileHandle = fopen($filename, 'w');
         $options    = array(
@@ -101,143 +108,22 @@ class MimeTypesPlugin implements PluginInterface, EventSubscriberInterface
     }
 
     /**
-     * Generate a PHP configuration file from the TXT data file.
+     * Save the configuration to a file.
      *
      * @since 0.1.0
      *
-     * @param string $txtFile Path to the TXT file.
-     * @param string $phpFile Path to the PHP file.
+     * @param string $filename Filename of the file to save.
+     * @param string $data     Data to save to the file.
      */
-    protected static function generateConfig($txtFile, $phpFile)
+    private static function writeConfigFile($filename, $data)
     {
-        $lines = file($txtFile);
-        $lines = array_filter($lines, __CLASS__ . '::filterComments');
-        $lines = array_map(__CLASS__ . '::splitLines', $lines);
-
-        $data = '<?php' . PHP_EOL;
-        $data .= '/* DO NOT EDIT! This file has been automatically generated. Run composer update to fetch a new version. */' . PHP_EOL;
-        $data .= 'return array(' . PHP_EOL;
-        $data .= '   \'mime-types\' => array(' . PHP_EOL;
-        foreach (self::getMimeTypes($lines) as $mimeType => $extensions) {
-            $data .= '      \'' . addslashes($mimeType) . '\' => ' . self::renderArray($extensions) . ',' . PHP_EOL;
-        }
-        $data .= '   ),' . PHP_EOL;
-        $data .= '   \'extensions\' => array(' . PHP_EOL;
-        foreach (self::getExtensions($lines) as $extension => $mimeTypes) {
-            $data .= '      \'' . addslashes($extension) . '\' => ' . self::renderArray($mimeTypes) . ',' . PHP_EOL;
-        }
-        $data .= '   ),' . PHP_EOL;
-        $data .= ');' . PHP_EOL;
-        file_put_contents($phpFile, $data);
-    }
-
-    /**
-     * Render an array as "array( <data> )" PHP code.
-     *
-     * @since 0.1.0
-     *
-     * @param array $data Array to render.
-     *
-     * @return string PHP code representing the provided array.
-     */
-    protected static function renderArray($data)
-    {
-        $elements = array();
-
-        if (! is_array($data)) {
-            var_dump($data);
-        }
-
-        foreach ($data as $key => $value) {
-            $elements[] = is_string($key)
-                ? $key . ' => \'' . addslashes($value) . '\''
-                : '\'' . addslashes($value) . '\'';
-        }
-
-        return 'array( ' . implode(', ', $elements) . ' )';
-    }
-
-    /**
-     * Get the MIME-type-based array from the lines of data.
-     *
-     * @since 0.1.0
-     *
-     * @param array $lines Lines of data.
-     *
-     * @return array MIME-type-based array.
-     */
-    protected static function getMimeTypes($lines)
-    {
-        $result = array();
-
-        foreach ($lines as $line) {
-            $result[$line[0]] = explode(' ', trim($line[1]));
-        }
-
-        ksort($result);
-
-        return $result;
-    }
-
-    /**
-     * Get the extension-based array from the lines of data.
-     *
-     * @since 0.1.0
-     *
-     * @param array $lines Lines of data.
-     *
-     * @return array Extension-based array.
-     */
-    protected static function getExtensions($lines)
-    {
-        $result = array();
-
-        foreach ($lines as $line) {
-            foreach (explode(' ', trim($line[1])) as $extension) {
-                $mimeTypes          = array_key_exists($extension, $result) ? $result[$extension] : array();
-                $mimeTypes[]        = $line[0];
-                $result[$extension] = $mimeTypes;
-            }
-        }
-
-        ksort($result);
-
-        return $result;
-    }
-
-    /**
-     * Filter function to eliminate comments from the MIE types source file.
-     *
-     * @since 0.1.0
-     *
-     * @param string $line Line to filter.
-     *
-     * @return bool Whether the line should be kept or not.
-     */
-    protected static function filterComments($line)
-    {
-        return 0 !== strpos($line, '#');
-    }
-
-    /**
-     * Mapping function to split a line into two parts: MIME type and extensions.
-     *
-     * @since 0.1.0
-     *
-     * @param string $line Line to split.
-     *
-     * @return array Array of MIME type and extensions parts.
-     */
-    protected static function splitLines($line)
-    {
-        $parts = explode("\t", $line);
-        return array(array_shift($parts), array_pop($parts));
+        file_put_contents($filename, $data);
     }
 
     /**
      * Activate the plugin.
      *
-     * @since 0.1.3
+     * @since 0.1.0
      *
      * @param Composer    $composer The main Composer object.
      * @param IOInterface $io       The i/o interface to use.
