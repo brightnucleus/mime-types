@@ -16,7 +16,7 @@ use RuntimeException;
 /**
  * Class ConfigGenerator.
  *
- * @since   0.1.2
+ * @since   0.2.0
  *
  * @package BrightNucleus\MimeTypes
  * @author  Alain Schlesser <alain.schlesser@gmail.com>
@@ -26,7 +26,7 @@ final class ConfigGenerator
     /**
      * Source data file to generate the config from.
      *
-     * @since 0.1.2
+     * @since 0.2.0
      *
      * @var string
      */
@@ -35,7 +35,7 @@ final class ConfigGenerator
     /**
      * Instantiate a ConfigGenerator object.
      *
-     * @since 0.1.2
+     * @since 0.2.0
      *
      * @param string $txtFile Source data file to generate the config from.
      *
@@ -58,7 +58,7 @@ final class ConfigGenerator
     /**
      * Generate a PHP configuration file from the TXT data file.
      *
-     * @since 0.1.2
+     * @since 0.2.0
      * @return string Configuration data.
      */
     public function generate()
@@ -87,7 +87,7 @@ final class ConfigGenerator
     /**
      * Render an array as "array( <data> )" PHP code.
      *
-     * @since 0.1.2
+     * @since 0.2.0
      *
      * @param array $data Array to render.
      *
@@ -113,7 +113,7 @@ final class ConfigGenerator
     /**
      * Get the MIME-type-based array from the lines of data.
      *
-     * @since 0.1.2
+     * @since 0.2.0
      *
      * @param array $lines Lines of data.
      *
@@ -135,7 +135,7 @@ final class ConfigGenerator
     /**
      * Get the extension-based array from the lines of data.
      *
-     * @since 0.1.2
+     * @since 0.2.0
      *
      * @param array $lines Lines of data.
      *
@@ -161,7 +161,7 @@ final class ConfigGenerator
     /**
      * Filter function to eliminate comments from the MIE types source file.
      *
-     * @since 0.1.2
+     * @since 0.2.0
      *
      * @param string $line Line to filter.
      *
@@ -175,7 +175,7 @@ final class ConfigGenerator
     /**
      * Mapping function to split a line into two parts: MIME type and extensions.
      *
-     * @since 0.1.2
+     * @since 0.2.0
      *
      * @param string $line Line to split.
      *
