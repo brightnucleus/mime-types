@@ -12,7 +12,7 @@
 namespace BrightNucleus\MimeTypes;
 
 /**
- * Class Country.
+ * Class MimeTypes.
  *
  * @since   0.1.0
  *
