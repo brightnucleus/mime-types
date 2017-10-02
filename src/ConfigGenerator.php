@@ -61,7 +61,7 @@ final class ConfigGenerator
      * @since 0.1.2
      * @return string Configuration data.
      */
-    public function generate($phpFile)
+    public function generate()
     {
         $lines = file($this->txtFile);
         $lines = array_filter($lines, array($this, 'filterComments'));
