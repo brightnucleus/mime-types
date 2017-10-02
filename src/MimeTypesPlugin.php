@@ -78,7 +78,7 @@ final class MimeTypesPlugin implements PluginInterface, EventSubscriberInterface
 
         $io->write(
             sprintf(
-                'The MIME types database has been updated (%1$s).',
+                '<info>The MIME types database has been updated.</info> (%1$s).',
                 $dataFilename . '.php'
             )
         );
