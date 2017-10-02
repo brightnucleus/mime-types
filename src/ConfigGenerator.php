@@ -59,8 +59,7 @@ final class ConfigGenerator
      * Generate a PHP configuration file from the TXT data file.
      *
      * @since 0.1.2
-     *
-     * @param string $phpFile Path to the PHP file.
+     * @return string Configuration data.
      */
     public function generate($phpFile)
     {
@@ -82,7 +81,7 @@ final class ConfigGenerator
         }
         $data .= '   ),' . PHP_EOL;
         $data .= ');' . PHP_EOL;
-        file_put_contents($phpFile, $data);
+        return $data;
     }
 
     /**
